@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamro Mobile Hub</title>
+    <style>
+        /* --- CSS STYLING --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: #1a252f;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        .cart-icon-container {
+            position: relative;
+            cursor: pointer;
+            background: #3498db;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .cart-icon-container:hover {
+            background: #2980b9;
+        }
+
+        #cart-count {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 12px;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-weight: bold;
+        }
+
+        /* Hero Banner */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        /* Filters */
+        .filter-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-container select, .filter-container input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .filter-container input {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        /* Main Store Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        .product-brand {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .product-title {
+            font-size: 18px;
+            margin: 5px 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+
+        .btn-add {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover {
+            background-color: #2980b9;
+        }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .cart-sidebar h3 {
+            border-bottom: 2px solid #f4f6f9;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .cart-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f4f6f9;
+            font-size: 14px;
+        }
+
+        .cart-item-info h4 {
+            font-weight: 600;
+        }
+
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 18px;
+            border-top: 2px solid #f4f6f9;
+            padding-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .btn-checkout {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .btn-checkout:hover {
+            background-color: #1b5e20;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo">
+            <h1>Hamro<span>Mobile</span></h1>
+        </div>
+        <div class="cart-icon-container">
+            🛒 Cart <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h2>Up to 20% Off on Latest Smartphones!</h2>
+        <p>Aaja nai order garnuhos ra gajjab ko offers paunuhos.</p>
+    </section>
+
+    <!-- Filter Section -->
+    <div class="filter-container">
+        <input type="text" id="search-bar" placeholder="Mobile ko naam khojnuhaos...">
+        <select id="brand-filter">
+            <option value="all">Sabhai Brand</option>
+            <option value="Apple">Apple</option>
+            <option value="Samsung">Samsung</option>
+            <option value="Xiaomi">Xiaomi</option>
+        </select>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <!-- Products Grid Left Side -->
+        <main class="products-grid" id="products-container">
+            <!-- Products dynamic vishleshan JS bata hunchha -->
+        </main>
+
+        <!-- Cart Section Right Side -->
+        <aside class="cart-sidebar">
+            <h3>Tapaiko Cart</h3>
+            <div class="cart-items" id="cart-items-container">
+                <!-- Cart items load JS bata hunchha -->
+                <p style="color: #7f8c8d; text-align: center; padding: 20px 0;">Cart khali chha</p>
+            </div>
+            <div class="cart-total">
+                <span>Total Amount:</span>
+                <span>Rs. <span id="cart-total-price">0</span></span>
+            </div>
+            <button class="btn-checkout" onclick="checkout()">Check Out</button>
+        </aside>
+    </div>
+
+    <!-- --- JAVASCRIPT --- -->
+    <script>
+        // 1. Mobile Data (Database jastai)
+        const products = [
+            {
+                id: 1,
+                name: "iPhone 15 Pro Max",
+                brand: "Apple",
+                price: 195000,
+                image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=300&q=80"
+            },
+            {
+                id: 2,
+                name: "Samsung Galaxy S24 Ultra",
+                brand: "Samsung",
+                price: 184000,
+                image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=300&q=80"
+            },
+            {
+                id: 3,
+                name: "Xiaomi 14 Ultra",
+                brand: "Xiaomi",
+                price: 135000,
+                image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=300&q=80"
+            },
+            {
+                id: 4,
+                name: "iPhone 13",
+                brand: "Apple",
+                price: 99000,
+                image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=300&q=80"
+            },
+            {
+                id: 5,
+                name: "Samsung Galaxy A55",
+                brand: "Samsung",
+                price: 52000,
+                image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=300&q=80"
+            },
+            {
+                id: 6,
+                name: "Redmi Note 13 Pro+",
+                brand: "Xiaomi",
+                price: 48000,
+                image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=300&q=80"
+            }
+        ];
+
+        let cart = [];
+
+        // 2. Elements Selection
+        const productsContainer = document.getElementById('products-container');
+        const searchBar = document.getElementById('search-bar');
+        const brandFilter = document.getElementById('brand-filter');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartCount = document.getElementById('cart-count');
+        const cartTotalPrice = document.getElementById('cart-total-price');
+
+        // 3. Render Products on Screen
+        function displayProducts(productsList) {
+            productsContainer.innerHTML = "";
+            if (productsList.length === 0) {
+                productsContainer.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-size: 18px; padding: 40px;">Hamilai yo mobile bhetiyeन 😢</p>`;
+                return;
+            }
+
+            productsList.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <img class="product-image" src="${product.image}" alt="${product.name}">
+                    <div>
+                        <p class="product-brand">${product.brand}</p>
+                        <h3 class="product-title">${product.name}</h3>
+                    </div>
+                    <div>
+                        <p class="product-price">Rs. ${product.price.toLocaleString()}</p>
+                        <button class="btn-add" onclick="addToCart(${product.id})">Add to Cart</button>
+                    </div>
+                `;
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        // 4. Search and Filter Functionality
+        function filterProducts() {
+            const searchValue = searchBar.value.toLowerCase();
+            const selectedBrand = brandFilter.value;
+
+            const filtered = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchValue);
+                const matchesBrand = selectedBrand === "all" || product.brand === selectedBrand;
+                return matchesSearch && matchesBrand;
+            });
+
+            displayProducts(filtered);
+        }
+
+        searchBar.addEventListener('input', filterProducts);
+        brandFilter.addEventListener('change', filterProducts);
+
+        // 5. Cart Functions
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const exists = cart.find(item => item.id === id);
+
+            if (exists) {
+                exists.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCart();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        }
+
+        function updateCart() {
+            // Cart count update
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.innerText = totalCount;
+
+            // Cart list update
+            cartItemsContainer.innerHTML = "";
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `<p style="color: #7f8c8d; text-align: center; padding: 20px 0;">Cart khali chha</p>`;
+            } else {
+                cart.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.classList.add('cart-item');
+                    cartItem.innerHTML = `
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p style="color: #7f8c8d;">Rs. ${item.price.toLocaleString()} x ${item.quantity}</p>
+                        </div>
+                        <button class="btn-remove" onclick="removeFromCart(${item.id})">Rakhnuhos</button>
+                    `;
+                    cartItemsContainer.appendChild(cartItem);
+                });
+            }
+
+            // Total price update
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotalPrice.innerText = totalPrice.toLocaleString();
+        }
+
+        function checkout() {
+            if(cart.length === 0) {
+                alert("Tapaiko cart khali chha! Please kunai mobile thapnus.");
+            } else {
+                alert("Danyabaad! Tapaiko order received vayo. (Simulated Checkout)");
+                cart = [];
+                updateCart();
+            }
+        }
+
+        // Initialize display
+        displayProducts(products);
+    </script>
+</body>
+</html>
